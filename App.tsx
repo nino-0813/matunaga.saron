@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { QUESTIONS, ARM_TYPES } from './constants';
 import { ArmType, ArmTypeInfo, DiagnosisResult } from './types';
 import { getPersonalizedInsight } from './services/chatgptService';
@@ -8,14 +8,14 @@ import { LucideChevronRight, LucideCheck, LucideSparkles, LucideCalendar, Lucide
 // Components
 const LandingPage: React.FC<{ onStart: () => void }> = ({ onStart }) => (
   <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-6 fade-in">
-    <div className="mb-8 tracking-[0.2em] text-stone-400 uppercase text-sm font-luxury">Upper Arm Aesthetics</div>
-    <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-stone-800">
-      あなたの二の腕に隠された<br />
-      <span className="text-amber-700 italic font-luxury">Potential</span> を知る
+    <div className="mb-8 tracking-[0.2em] text-stone-400 uppercase text-sm font-luxury">Arm Diagnosis</div>
+    <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight text-stone-800">
+      二の腕やせ診断<br />
+      <span className="text-amber-700 italic font-luxury">あなたのタイプがわかる</span>
     </h1>
-    <p className="max-w-md text-stone-500 mb-12 leading-relaxed">
-      心理学と専門エステティシャンの知見から導き出す、<br />
-      6つの美腕タイプ診断。
+    <p className="max-w-md text-stone-500 mb-8 leading-relaxed text-sm">
+      10の質問に答えるだけで<br />
+      <span className="font-semibold text-stone-700">二の腕が戻らない理由</span>がわかります
     </p>
     <button
       onClick={onStart}
@@ -55,16 +55,16 @@ const QuestionView: React.FC<{
         {question.subtext && <p className="text-sm text-stone-400 italic">{question.subtext}</p>}
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         {question.options.map((option, idx) => (
           <button
             key={idx}
             onClick={() => onAnswer(option.scores)}
-            className="w-full text-left p-6 border border-stone-100 hover:border-amber-200 hover:bg-amber-50/30 transition-all group flex items-center justify-between"
+            className="w-full text-center p-8 border-2 border-stone-200 hover:border-amber-400 hover:bg-amber-50/50 transition-all group flex flex-col items-center justify-center gap-3"
           >
-            <span className="text-stone-700 group-hover:text-amber-900 transition-colors">{option.label}</span>
-            <div className="w-5 h-5 rounded-full border border-stone-200 group-hover:border-amber-400 transition-all flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-amber-400 opacity-0 group-hover:opacity-100 transition-all"></div>
+            <span className="text-lg font-semibold text-stone-700 group-hover:text-amber-900 transition-colors">{option.label}</span>
+            <div className="w-6 h-6 rounded-full border-2 border-stone-300 group-hover:border-amber-500 transition-all flex items-center justify-center">
+              <div className="w-3 h-3 rounded-full bg-amber-500 opacity-0 group-hover:opacity-100 transition-all"></div>
             </div>
           </button>
         ))}
@@ -74,6 +74,8 @@ const QuestionView: React.FC<{
 };
 
 const ResultView: React.FC<{ result: DiagnosisResult }> = ({ result }) => {
+  const [ctaMode, setCtaMode] = useState<'gentle' | 'direct'>('gentle');
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-16 fade-in">
       <div className="text-center mb-16">
@@ -81,31 +83,78 @@ const ResultView: React.FC<{ result: DiagnosisResult }> = ({ result }) => {
           <LucideSparkles className="text-amber-600" size={32} />
         </div>
         <div className="text-stone-400 tracking-[0.3em] uppercase text-xs mb-4 font-luxury">Diagnosis Result</div>
-        <h2 className="text-sm text-stone-500 mb-2">あなたのタイプは...</h2>
-        <div className="text-4xl md:text-5xl font-bold text-stone-900 mb-6 font-serif">{result.topType.name}</div>
-        <p className="text-lg italic text-amber-800 font-serif opacity-80">" {result.topType.catchphrase} "</p>
+        <h2 className="text-sm text-stone-500 mb-2">あなたの診断結果</h2>
+        <div className="text-2xl md:text-3xl font-bold text-amber-700 mb-4 font-serif">{result.topType.name}</div>
+        <div className="text-lg md:text-xl text-stone-700 mb-6 leading-relaxed">{result.topType.catchphrase}</div>
       </div>
 
       <div className="bg-white border border-stone-100 p-8 md:p-12 mb-12 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-          <span className="text-8xl font-luxury italic">Type</span>
+          <span className="text-8xl font-luxury italic">Result</span>
         </div>
         
         <div className="mb-10">
-          <h3 className="text-xs tracking-widest text-stone-400 uppercase font-luxury mb-4 border-b border-stone-100 pb-2">Analysis</h3>
-          <p className="text-stone-700 leading-relaxed whitespace-pre-wrap">{result.topType.description}</p>
+          <p className="text-stone-700 leading-relaxed whitespace-pre-wrap text-base">{result.topType.description}</p>
         </div>
 
         <div className="mb-10">
-          <h3 className="text-xs tracking-widest text-stone-400 uppercase font-luxury mb-4 border-b border-stone-100 pb-2">Therapist Insight</h3>
+          <h3 className="text-xs tracking-widest text-stone-400 uppercase font-luxury mb-4 border-b border-stone-100 pb-2">専門家からのメッセージ</h3>
           <p className="text-stone-800 font-serif leading-relaxed italic bg-stone-50 p-6 rounded-sm">
             {result.aiInsight || "あなたの二の腕には、まだ眠っている本来の美しさがあります。"}
           </p>
         </div>
 
         <div className="mb-10">
-          <h3 className="text-xs tracking-widest text-stone-400 uppercase font-luxury mb-4 border-b border-stone-100 pb-2">Expert Advice</h3>
-          <p className="text-stone-700 leading-relaxed">{result.topType.advice}</p>
+          <h3 className="text-xs tracking-widest text-stone-400 uppercase font-luxury mb-4 border-b border-stone-100 pb-2">アドバイス</h3>
+          <p className="text-stone-700 leading-relaxed whitespace-pre-wrap mb-8">{result.topType.advice}</p>
+          
+          {/* 食事アドバイス */}
+          {result.topType.dietAdvice && result.topType.dietAdvice.length > 0 && (
+            <div className="mb-8 p-6 bg-stone-50 rounded-sm">
+              <h4 className="text-base font-bold text-stone-900 mb-4 flex items-center gap-2">
+                <span className="text-amber-600 font-serif">【食事】</span>
+              </h4>
+              <ul className="space-y-3">
+                {result.topType.dietAdvice.map((advice, idx) => (
+                  <li key={idx} className="text-stone-700 leading-relaxed flex items-start gap-3">
+                    <span className="text-amber-500 mt-1 font-bold">・</span>
+                    <span className="flex-1">{advice}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* 行動アドバイス */}
+          {result.topType.actionAdvice && result.topType.actionAdvice.length > 0 && (
+            <div className="mb-8 p-6 bg-stone-50 rounded-sm">
+              <h4 className="text-base font-bold text-stone-900 mb-4 flex items-center gap-2">
+                <span className="text-amber-600 font-serif">【行動】</span>
+              </h4>
+              <ul className="space-y-3">
+                {result.topType.actionAdvice.map((advice, idx) => (
+                  <li key={idx} className="text-stone-700 leading-relaxed flex items-start gap-3">
+                    <span className="text-amber-500 mt-1 font-bold">・</span>
+                    <span className="flex-1">{advice}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          <div className="mt-8 p-6 bg-amber-50 border-l-4 border-amber-400 rounded-sm">
+            <p className="text-stone-700 leading-relaxed text-sm">
+              無料カウンセリングでは、<br />
+              あなたの状態に合わせた<br />
+              二の腕改善の進め方を<br />
+              具体的にお伝えしています。
+            </p>
+            <p className="text-stone-600 leading-relaxed text-sm mt-4 italic">
+              「少し話を聞いてみたい」<br />
+              そんな気持ちで大丈夫ですよ。
+            </p>
+          </div>
+          
           <div className="flex flex-wrap gap-2 mt-4">
             {result.topType.keywords.map(k => (
               <span key={k} className="text-[10px] tracking-widest uppercase bg-stone-100 text-stone-500 px-3 py-1 rounded-full">#{k}</span>
@@ -114,16 +163,58 @@ const ResultView: React.FC<{ result: DiagnosisResult }> = ({ result }) => {
         </div>
       </div>
 
-      <div className="bg-stone-900 text-white p-10 text-center rounded-sm">
-        <h3 className="text-2xl font-bold mb-4">体験コースのご案内</h3>
-        <p className="text-stone-400 text-sm mb-8 leading-relaxed">
-          あなたのタイプに合わせたオーダーメイドケアを、<br />
-          今なら特別価格でご体験いただけます。
-        </p>
-        <button className="w-full md:w-auto px-12 py-4 bg-white text-stone-900 font-bold tracking-widest hover:bg-stone-100 transition-all flex items-center justify-center gap-2 mx-auto">
-          <LucideCalendar size={20} /> 無料カウンセリングを予約する
-        </button>
-        <p className="mt-4 text-[10px] text-stone-500 uppercase tracking-widest">Limited availability for new clients</p>
+      {/* CTA Section with toggle */}
+      <div className="bg-white border-2 border-stone-200 p-10 text-center rounded-sm mb-4 shadow-sm">
+        <div className="flex gap-2 justify-center mb-6">
+          <button
+            onClick={() => setCtaMode('gentle')}
+            className={`px-4 py-2 text-xs tracking-widest transition-all ${
+              ctaMode === 'gentle' 
+                ? 'bg-stone-900 text-white' 
+                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+            }`}
+          >
+            パターン①
+          </button>
+          <button
+            onClick={() => setCtaMode('direct')}
+            className={`px-4 py-2 text-xs tracking-widest transition-all ${
+              ctaMode === 'direct' 
+                ? 'bg-stone-900 text-white' 
+                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+            }`}
+          >
+            パターン②
+          </button>
+        </div>
+
+        {ctaMode === 'gentle' ? (
+          <>
+            <h3 className="text-xl font-bold mb-4 text-stone-900">無料で受け取る</h3>
+            <p className="text-stone-600 text-sm mb-6 leading-relaxed">
+              今のあなたの状態に合わせた<br />
+              <span className="font-semibold text-stone-900">「二の腕タイプ別アドバイス」</span>を<br />
+              LINEで無料でお伝えしています。
+            </p>
+            <button className="w-full md:w-auto px-12 py-4 bg-stone-900 text-white font-bold tracking-widest hover:bg-stone-800 transition-all flex items-center justify-center gap-2 mx-auto">
+              <LucideChevronRight size={20} /> 無料で受け取る
+            </button>
+          </>
+        ) : (
+          <>
+            <h3 className="text-xl font-bold mb-4 text-stone-900">無料カウンセリングを予約する</h3>
+            <p className="text-stone-600 text-sm mb-6 leading-relaxed">
+              実際に<br />
+              <span className="font-semibold text-stone-900">「同じ悩みだった方」</span>が<br />
+              6〜8回でどんな変化をしたか<br />
+              体験ベースでご説明できます。
+            </p>
+            <button className="w-full md:w-auto px-12 py-4 bg-stone-900 text-white font-bold tracking-widest hover:bg-stone-800 transition-all flex items-center justify-center gap-2 mx-auto">
+              <LucideCalendar size={20} /> 無料カウンセリングを予約する
+            </button>
+          </>
+        )}
+        <p className="mt-4 text-[10px] text-stone-400 uppercase tracking-widest">Limited availability for new clients</p>
       </div>
     </div>
   );
@@ -137,7 +228,7 @@ const App: React.FC = () => {
 
   const startQuiz = () => setStep('quiz');
 
-  const handleAnswer = useCallback(async (scores: Partial<Record<ArmType, number>>) => {
+  const handleAnswer = useCallback(async (scores: Partial<Record<ArmType, number>> & { YES_COUNT?: number }) => {
     const newAnswers = [...answers, scores];
     setAnswers(newAnswers);
 
@@ -146,25 +237,37 @@ const App: React.FC = () => {
     } else {
       setStep('loading');
       
-      // Calculate final scores
-      const finalScores: Record<ArmType, number> = {
-        [ArmType.CHIFFON_EDEMA]: 0,
-        [ArmType.MARBLE_CELLULITE]: 0,
-        [ArmType.ANTIQUE_SAGGING]: 0,
-        [ArmType.SHADOW_POSTURE]: 0,
-        [ArmType.TENSE_MUSCLE]: 0,
-        [ArmType.PRISM_MIXED]: 0,
-      };
-
+      // Count total YES answers
+      // YES is selected if any type has a score > 0 (meaning user selected "はい")
+      let yesCount = 0;
       newAnswers.forEach(answer => {
-        // Fix: Explicitly cast score to number to fix 'unknown' type error in += operation
+        let hasYes = false;
         Object.entries(answer).forEach(([type, score]) => {
-          finalScores[type as ArmType] += (score as number) || 0;
+          if (type !== 'YES_COUNT' && Object.values(ArmType).includes(type as ArmType) && (score as number) > 0) {
+            hasYes = true;
+          }
         });
+        if (hasYes) {
+          yesCount++;
+        }
       });
 
-      // Find winner
-      const topTypeKey = Object.entries(finalScores).reduce((a, b) => (a[1] > b[1] ? a : b))[0] as ArmType;
+      // Determine type based on YES count (画像のロジックに従う)
+      let topTypeKey: ArmType;
+      if (yesCount >= 7) {
+        // YESが7~10個 → むくみ&代謝ダウンタイプ
+        topTypeKey = ArmType.EDEMA_METABOLISM;
+      } else if (yesCount >= 4) {
+        // YESが4~6個 → 姿勢ゆがみタイプ
+        topTypeKey = ArmType.POSTURE_USAGE;
+      } else if (yesCount >= 2) {
+        // YESが2~3個 → 食習慣タイプ
+        topTypeKey = ArmType.DIET_HABIT;
+      } else {
+        // YESが0~1個 → 隠れ筋力不足タイプ
+        topTypeKey = ArmType.MUSCLE_FOUNDATION;
+      }
+
       const topTypeInfo = ARM_TYPES[topTypeKey];
 
       // Get ChatGPT Insight
@@ -172,7 +275,7 @@ const App: React.FC = () => {
 
       setDiagnosisResult({
         topType: topTypeInfo,
-        scores: finalScores,
+        scores: {} as Record<ArmType, number>,
         aiInsight
       });
       setStep('result');

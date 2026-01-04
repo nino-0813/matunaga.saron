@@ -1,11 +1,9 @@
 
 export enum ArmType {
-  CHIFFON_EDEMA = 'CHIFFON_EDEMA',
-  MARBLE_CELLULITE = 'MARBLE_CELLULITE',
-  ANTIQUE_SAGGING = 'ANTIQUE_SAGGING',
-  SHADOW_POSTURE = 'SHADOW_POSTURE',
-  TENSE_MUSCLE = 'TENSE_MUSCLE',
-  PRISM_MIXED = 'PRISM_MIXED'
+  EDEMA_METABOLISM = 'EDEMA_METABOLISM', // むくみ・代謝ダウン型
+  POSTURE_USAGE = 'POSTURE_USAGE', // 姿勢・使い方型
+  DIET_HABIT = 'DIET_HABIT', // 食習慣影響型
+  MUSCLE_FOUNDATION = 'MUSCLE_FOUNDATION' // 筋力・土台不足型
 }
 
 export interface ArmTypeInfo {
@@ -15,6 +13,8 @@ export interface ArmTypeInfo {
   description: string;
   advice: string;
   keywords: string[];
+  dietAdvice?: string[];
+  actionAdvice?: string[];
 }
 
 export interface Question {
@@ -23,7 +23,7 @@ export interface Question {
   subtext?: string;
   options: {
     label: string;
-    scores: Partial<Record<ArmType, number>>;
+    scores: Partial<Record<ArmType, number>> & { YES_COUNT?: number };
   }[];
 }
 
